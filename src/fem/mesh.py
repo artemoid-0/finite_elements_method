@@ -1,5 +1,6 @@
 import numpy as np
 import scipy.spatial
+from matplotlib import pyplot as plt
 
 
 def create_rectangular_mesh(x_min, x_max, y_min, y_max, nx, ny):
@@ -123,3 +124,46 @@ def calculate_element_areas(nodes, elements):
         ])))
         areas.append(area)
     return np.array(areas)
+
+
+def plot_mesh(nodes, elements, title="Mesh Visualization"):
+    """
+    Визуализирует сетку.
+
+    Parameters:
+    nodes (np.ndarray): Координаты узлов.
+    elements (np.ndarray): Элементы сетки.
+    title (str): Заголовок графика.
+    """
+    plt.figure(figsize=(10, 10))
+    for element in elements:
+        polygon = plt.Polygon(nodes[element], edgecolor='k', facecolor='none')
+        plt.gca().add_patch(polygon)
+    plt.plot(nodes[:, 0], nodes[:, 1], 'ro')  # Узлы
+    plt.title(title)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.show()
+
+def plot_elements(nodes, elements, title="Element Visualization"):
+    """
+    Визуализирует элементы сетки, соединяя точки в элементы.
+
+    Parameters:
+    nodes (np.ndarray): Координаты узлов.
+    elements (np.ndarray): Элементы сетки.
+    title (str): Заголовок графика.
+    """
+    plt.figure(figsize=(10, 10))
+    for element in elements:
+        for i in range(len(element)):
+            start_node = nodes[element[i]]
+            end_node = nodes[element[(i + 1) % len(element)]]
+            plt.plot([start_node[0], end_node[0]], [start_node[1], end_node[1]], 'k-')
+    plt.plot(nodes[:, 0], nodes[:, 1], 'ro')  # Узлы
+    plt.title(title)
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.xlabel('X')
+    plt.ylabel('Y')
+    plt.show()

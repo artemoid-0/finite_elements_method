@@ -1,5 +1,5 @@
 import numpy as np
-from stiffness_matrix import assemble_global_stiffness_matrix
+from src.fem.stifness.stiffness_matrix import assemble_global_stiffness_matrix
 from boundary_conditions import apply_boundary_conditions
 
 def solve_fem(node_coords, elements, E, nu, fixed_nodes, forces):
