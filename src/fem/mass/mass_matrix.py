@@ -30,6 +30,9 @@ def element_mass_matrix(rho, coords):
         [1, 1, 2]
     ])
 
+    print("Элементная матрица массы для координат:", coords)
+    print(me)
+
     return me
 
 
@@ -55,6 +58,9 @@ def assemble_global_mass_matrix(elements, node_coords, rho):
         for i in range(3):
             for j in range(3):
                 M_global[2 * element[i]:2 * element[i] + 2, 2 * element[j]:2 * element[j] + 2] += me[i, j]
+
+    print("Глобальная матрица массы до применения граничных условий:")
+    print(M_global)
 
     return M_global
 

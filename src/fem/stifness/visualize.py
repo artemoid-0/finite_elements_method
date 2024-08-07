@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.fem.mesh import create_rectangular_mesh, create_triangular_mesh, create_adaptive_mesh, plot_mesh, plot_elements
+from src.fem.mesh import create_regular_triangular_mesh_in_rectangle, create_triangular_mesh, create_adaptive_mesh, plot_mesh, plot_elements
 from stiffness_matrix import assemble_global_stiffness_matrix
 from boundary_conditions import apply_boundary_conditions
 from solve_fem import solve_fem
@@ -35,7 +35,7 @@ def main():
     np.random.seed(0)
 
     # Пример для прямоугольной сетки
-    node_coords, elements = create_rectangular_mesh(0, 1, 0, 1, 5, 5)
+    node_coords, elements = create_regular_triangular_mesh_in_rectangle(0, 1, 0, 1, 5, 5)
 
     # Визуализация исходной сетки
     plot_mesh(node_coords, elements, "Rectangular Mesh")
@@ -48,7 +48,7 @@ def main():
     # Применение сил и граничных условий
     fixed_nodes = [0, 5]
     forces = np.zeros(2 * len(node_coords))
-    forces[12] = -5e9  # Пример внешних сил (увеличенная сила)
+    forces[12] = -5e9  # Пример внешних сил
 
     # Решение задачи методом конечных элементов
     displacements = solve_fem(node_coords, elements, E, nu, fixed_nodes, forces)

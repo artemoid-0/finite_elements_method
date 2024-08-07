@@ -1,70 +1,31 @@
-import cupy as cp
 import numpy as np
-import matplotlib.pyplot as plt
+import cupy as cp
+import time
 
+# Задаем размер матрицы и вектора
+n = 20000  # можно увеличить размер для более длительного тестирования
 
-def create_mesh(nx, ny, length, height):
-    """
-    Создает сетку узлов в двумерной области.
+# Генерация произвольной матрицы K и вектора F
+np.random.seed(0)  # для воспроизводимости
+start = time.time()
+K_global = np.random.rand(n, n)
+F = np.random.rand(n)
+print("Generation time:", time.time() - start)
 
-    Parameters:
-    nx (int): Количество узлов по оси x.
-    ny (int): Количество узлов по оси y.
-    length (float): Длина области по оси x.
-    height (float): Высота области по оси y.
+# Проверка решения с использованием numpy
+start_time = time.time()
+temperatures_numpy = np.linalg.solve(K_global, F)
+print("Numpy solve time:", time.time() - start_time)
 
-    Returns:
-    cp.ndarray: Массив координат узлов (xv, yv).
-    """
-    dx = length / (nx - 1)
-    dy = height / (ny - 1)
-    x = cp.linspace(0, length, nx)
-    y = cp.linspace(0, height, ny)
-    xv, yv = cp.meshgrid(x, y)
-    return xv, yv
+# Проверка времени копирования данных
+copy_start_time = time.time()
+K_global_gpu = cp.asarray(K_global)
+F_gpu = cp.asarray(F)
+copy_time = time.time() - copy_start_time
+print("Data copy time to GPU:", copy_time)
 
-
-def visualize_mesh(xv, yv):
-    """
-    Визуализирует сетку узлов с соединением точек в элементы.
-
-    Parameters:
-    xv (cp.ndarray): Массив координат узлов по оси x.
-    yv (cp.ndarray): Массив координат узлов по оси y.
-    """
-    plt.figure(figsize=(8, 8))
-    plt.scatter(xv, yv, marker='o', color='b', label='Nodes')
-
-    nx, ny = xv.shape
-
-    for i in range(nx - 1):
-        for j in range(ny - 1):
-            # Координаты четырех узлов элемента
-            x_coords = [xv[i, j], xv[i + 1, j], xv[i + 1, j + 1], xv[i, j + 1], xv[i, j]]
-            y_coords = [yv[i, j], yv[i + 1, j], yv[i + 1, j + 1], yv[i, j + 1], yv[i, j]]
-
-            # Рисуем линии, соединяющие узлы элемента
-            plt.plot(x_coords, y_coords, 'r-')
-
-    plt.title('Mesh Grid Visualization with Elements')
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.grid(True)
-    plt.legend()
-    plt.show()
-
-
-# Пример использования функций
-if __name__ == "__main__":
-    length = 1.0
-    height = 1.0
-    nx = 10
-    ny = 10
-
-    # Создание сетки
-    xv, yv = create_mesh(nx, ny, length, height)
-    xv = cp.asnumpy(xv)
-    yv = cp.asnumpy(yv)
-
-    # Визуализация сетки с элементами
-    visualize_mesh(xv, yv)
+# Проверка решения с использованием cupy, без учета времени копирования данных
+solve_start_time = time.time()
+temperatures_cupy = cp.linalg.solve(K_global_gpu, F_gpu)
+solve_time = time.time() - solve_start_time
+print("CuPy solve time (excluding data copy):", solve_time)
