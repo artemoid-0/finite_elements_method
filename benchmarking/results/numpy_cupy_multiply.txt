@@ -1,0 +1,12 @@
+20000
+Time taken (NumPy): 0:02:07.271161
+Time taken (CuPy): 0:01:15.681635
+
+25000
+Time taken (NumPy): 0:04:10.080259
+Time taken (CuPy): 0:02:45.810154
+
+30000
+Time taken (NumPy): 0:07:42.397002
+Time taken (CuPy): 0:07:14.698717
+Time taken (CuPy): 0:07:15.708557
