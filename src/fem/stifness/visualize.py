@@ -1,9 +1,9 @@
-import numpy as np
 import matplotlib.pyplot as plt
-from src.fem.mesh import create_regular_triangular_mesh_in_rectangle, plot_mesh, plot_elements
-from stiffness_matrix import assemble_global_stiffness_matrix
-from boundary_conditions import apply_boundary_conditions
+import numpy as np
+
 from solve_fem import solve_fem
+from src.fem.mesh import create_regular_triangular_mesh_in_rectangle, plot_mesh, plot_elements
+
 
 def visualize_results(node_coords, elements, displacements, scale=1.0):
     """

@@ -1,5 +1,3 @@
-import numpy as np
-
 def apply_boundary_conditions(K, F, fixed_nodes):
     """
     Applies boundary conditions to the system of equations.

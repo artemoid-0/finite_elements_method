@@ -1,4 +1,3 @@
-import numpy as np
 import cupy as cp
 from datetime import datetime
 import csv

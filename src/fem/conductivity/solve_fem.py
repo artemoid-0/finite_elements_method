@@ -1,11 +1,10 @@
-import numpy as np
-import cupy as cp
-import scipy as sp
 from datetime import datetime
-from src.fem.conductivity.conductivity_matrix import element_conductivity_matrix, element_conductivity_matrix, element_conductivity_matrix, assemble_global_conductivity_matrix
-from src.fem.conductivity.boundary_conditions import apply_boundary_conditions
 
-from datetime import datetime
+import numpy as np
+import scipy as sp
+
+from src.fem.conductivity.boundary_conditions import apply_boundary_conditions
+from src.fem.conductivity.conductivity_matrix import assemble_global_conductivity_matrix
 
 
 def solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_temperatures, heat_sources,

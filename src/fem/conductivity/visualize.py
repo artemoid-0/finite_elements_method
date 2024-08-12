@@ -2,13 +2,12 @@ from datetime import datetime
 
 import matplotlib.pyplot as plt
 import numpy as np
-from src.fem.mesh import create_regular_triangular_mesh_in_rectangle, create_random_triangular_mesh_in_rectangle, create_random_triangular_mesh_in_polygon, \
-    plot_mesh, plot_elements, create_adaptive_triangular_mesh_in_polygon, refinement_criteria
+
 from src.fem.conductivity.solve_fem import solve_fem_heat_transfer
+from src.fem.mesh import create_regular_triangular_mesh_in_rectangle, create_random_triangular_mesh_in_rectangle, \
+    create_random_triangular_mesh_in_polygon, \
+    plot_mesh, plot_elements, create_adaptive_triangular_mesh_in_polygon, refinement_criteria
 
-
-import matplotlib.pyplot as plt
-import numpy as np
 
 def visualize_heat_transfer(node_coords, elements, temperatures, title="None"):
     """
