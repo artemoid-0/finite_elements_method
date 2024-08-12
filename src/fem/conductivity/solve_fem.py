@@ -1,10 +1,15 @@
 import numpy as np
 import cupy as cp
+import scipy as sp
 from datetime import datetime
 from src.fem.conductivity.conductivity_matrix import element_conductivity_matrix, element_conductivity_matrix, element_conductivity_matrix, assemble_global_conductivity_matrix
 from src.fem.conductivity.boundary_conditions import apply_boundary_conditions
 
-def solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_temperatures, heat_sources):
+from datetime import datetime
+
+
+def solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_temperatures, heat_sources,
+                            solver_method='solve'):
     """
     Solves a finite element heat transfer problem.
 
@@ -15,6 +20,7 @@ def solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_tempera
     fixed_nodes (list of int): List of indices of fixed nodes.
     fixed_temperatures (list of float): List of temperatures for fixed nodes.
     heat_sources (np.ndarray): Vector of heat flows (N).
+    solver_method (str): Method to solve the system of equations.
 
     Returns:
     np.ndarray: Vector of temperatures (N).
@@ -23,26 +29,52 @@ def solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_tempera
     start_time = datetime.now()
     K_global = assemble_global_conductivity_matrix(elements, node_coords, k)
     print('Time taken to assemble global conductivity matrix: ', datetime.now() - start_time)
-    F = heat_sources.copy()
 
-    # Application of boundary conditions
+    F = np.array(heat_sources).flatten()
+
     start_time = datetime.now()
     K_global, F = apply_boundary_conditions(K_global, F, fixed_nodes, fixed_temperatures)
     print('Time taken to apply boundary conditions: ', datetime.now() - start_time)
 
+    density = np.count_nonzero(K_global) / K_global.size
+    print(f"Matrix density: {density}")
+
     # Solution of a system of equations
     start_time = datetime.now()
-    temperatures = np.linalg.solve(K_global, F)
-    # print("Converting:", datetime.now())
-    # K_global_cp = cp.asarray(K_global)
-    # F_cp = cp.asarray(F)
-    # print("Converting completed:", datetime.now())
-    # temperatures = (cp.linalg.solve(cp.asarray(K_global), cp.asarray(F)))
-    # print("Converting:", datetime.now())
-    # temperatures = cp.asnumpy(temperatures)
-    # print("Converting completed:", datetime.now())
+    if solver_method == 'solve':
+        temperatures = np.linalg.solve(K_global, F)
+    elif solver_method == 'spsolve':
+        temperatures = sp.sparse.linalg.spsolve(K_global, F)
+    elif solver_method == 'lsqr':
+        temperatures, istop, itn, r1norm = sp.sparse.linalg.lsqr(K_global, F)[:4]
+        print(f"Residual norm (r1norm) for LSQR: {r1norm}")
+    elif solver_method == 'cg':
+        temperatures, info = sp.sparse.linalg.cg(K_global, F)
+        if info != 0:
+            print(f"Residual norm for CG: {np.linalg.norm(K_global @ temperatures - F)}")
+    elif solver_method == 'bicg':
+        temperatures, info = sp.sparse.linalg.bicg(K_global, F)
+        if info != 0:
+            print(f"Residual norm for BiCG: {np.linalg.norm(K_global @ temperatures - F)}")
+    elif solver_method == 'bicgstab':
+        temperatures, info = sp.sparse.linalg.bicgstab(K_global, F)
+        if info != 0:
+            print(f"Residual norm for BiCGStab: {np.linalg.norm(K_global @ temperatures - F)}")
+    elif solver_method == 'gmres':
+        temperatures, info = sp.sparse.linalg.gmres(K_global, F)
+        if info != 0:
+            print(f"Residual norm for GMRES: {np.linalg.norm(K_global @ temperatures - F)}")
+    elif solver_method == 'minres':
+        temperatures, info = sp.sparse.linalg.minres(K_global, F)
+        if info != 0:
+            print(f"Residual norm for MINRES: {np.linalg.norm(K_global @ temperatures - F)}")
+    else:
+        raise ValueError(f"Unknown solver method: {solver_method}")
+
     print('Time taken to solve a system of equations: ', datetime.now() - start_time)
+
     return temperatures
+
 
 
 if __name__ == "__main__":

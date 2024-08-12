@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from src.fem.mesh import create_regular_triangular_mesh_in_rectangle, create_random_triangular_mesh_in_rectangle, create_random_triangular_mesh_in_polygon, \
     plot_mesh, plot_elements, create_adaptive_triangular_mesh_in_polygon, refinement_criteria
-from src.fem.conductivity.conductivity_matrix import assemble_global_conductivity_matrix
-from src.fem.conductivity.boundary_conditions import apply_boundary_conditions
 from src.fem.conductivity.solve_fem import solve_fem_heat_transfer
 
 
-def visualize_heat_transfer(node_coords, elements, temperatures):
+import matplotlib.pyplot as plt
+import numpy as np
+
+def visualize_heat_transfer(node_coords, elements, temperatures, title="None"):
     """
     Visualizes the results of a heat transfer problem.
 
@@ -17,10 +18,11 @@ def visualize_heat_transfer(node_coords, elements, temperatures):
     node_coords (np.ndarray): Node coordinates (Nx2).
     elements (list of list of int): List of elements, each specified as a list of node indices.
     temperatures (np.ndarray): Vector of temperatures (N).
+    title (str): Title for the graph. Default is "Temperature Distribution".
     """
     plt.tricontourf(node_coords[:, 0], node_coords[:, 1], np.array(elements), temperatures, levels=14, cmap='coolwarm')
     plt.colorbar()
-    plt.title("Temperature Distribution")
+    plt.title(title)  # Use the passed title
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.gca().set_aspect('equal', adjustable='box')
@@ -35,6 +37,7 @@ def main():
         [0, 0], [3, 0], [3, 3], [0, 3]
     ])
     initial_num_points = 10000
+    solver_method = 'spsolve'
 
     start_time = datetime.now()
     node_coords, elements = create_adaptive_triangular_mesh_in_polygon(polygon_vertices, initial_num_points,
@@ -67,14 +70,13 @@ def main():
         for i in nodes_in_cluster:
             heat_sources[i] = heat_per_node
 
-    # print("Heat sources:\n", heat_sources)
-
-    temperatures = solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_temperatures, heat_sources)
+    temperatures = solve_fem_heat_transfer(node_coords, elements, k, fixed_nodes, fixed_temperatures, heat_sources,
+                                               solver_method)
 
     print("Temperatures in nodes:\n", temperatures)
 
     start_time = datetime.now()
-    visualize_heat_transfer(node_coords, elements, temperatures)
+    visualize_heat_transfer(node_coords, elements, temperatures, title=solver_method)
     print("Heat transfer visualization time:", datetime.now() - start_time)
 
 
