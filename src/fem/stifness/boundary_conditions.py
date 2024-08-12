@@ -2,15 +2,15 @@ import numpy as np
 
 def apply_boundary_conditions(K, F, fixed_nodes):
     """
-    Применяет граничные условия к системе уравнений.
+    Applies boundary conditions to the system of equations.
 
     Parameters:
-    K (np.ndarray): Глобальная матрица жесткости.
-    F (np.ndarray): Вектор правых частей.
-    fixed_nodes (list of int): Список индексов фиксированных узлов.
+    K (np.ndarray): Global stiffness matrix.
+    F (np.ndarray): Right-hand side vector.
+    fixed_nodes (list of int): List of fixed node indices.
 
     Returns:
-    np.ndarray, np.ndarray: Измененные матрица жесткости и вектор правых частей.
+    np.ndarray, np.ndarray: Modified stiffness matrix and right-hand side vector.
     """
     for node in fixed_nodes:
         dof = [2 * node, 2 * node + 1]

@@ -4,18 +4,18 @@ from boundary_conditions import apply_boundary_conditions
 
 def solve_fem(node_coords, elements, E, nu, fixed_nodes, forces):
     """
-    Решает задачу методом конечных элементов.
+    Solves the problem using the finite element method.
 
     Parameters:
-    node_coords (np.ndarray): Координаты узлов (Nx2).
-    elements (list of list of int): Список элементов, каждый из которых задан как список индексов узлов.
-    E (float): Модуль Юнга материала.
-    nu (float): Коэффициент Пуассона материала.
-    fixed_nodes (list of int): Список индексов фиксированных узлов.
-    forces (np.ndarray): Вектор внешних сил (2N).
+    node_coords (np.ndarray): Node coordinates (Nx2).
+    elements (list of list of int): List of elements, each specified as a list of node indices.
+    E (float): Young's modulus of the material.
+    nu (float): Poisson's ratio of the material.
+    fixed_nodes (list of int): List of fixed node indices.
+    forces (np.ndarray): External force vector (2N).
 
     Returns:
-    np.ndarray: Вектор перемещений (2N).
+    np.ndarray: Displacement vector (2N).
     """
     K_global = assemble_global_stiffness_matrix(elements, node_coords, E, nu)
     F = forces.copy()
